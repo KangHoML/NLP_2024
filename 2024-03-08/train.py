@@ -4,10 +4,13 @@ import argparse
 import matplotlib.pyplot as plt
 
 from torchvision.models import resnet50, ResNet50_Weights
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, DistributedSampler
 from torch.nn import CrossEntropyLoss
 from torch.optim import Adam
 from tqdm import tqdm
+
+import torch.distributed as dist
+from torch.nn.parallel import DistributedDataParallel
 
 from data import CIFAR10Dataset
 parser = argparse.ArgumentParser()
