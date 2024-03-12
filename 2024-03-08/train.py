@@ -10,7 +10,6 @@ from torch.optim import Adam
 from tqdm import tqdm
 
 from data import CIFAR10Dataset
-
 parser = argparse.ArgumentParser()
 parser.add_argument("--data_path", type=str, default="./datasets/CIFAR-10")
 parser.add_argument("--batch_size", type=int, default=128)
@@ -34,6 +33,7 @@ def train(args):
     os.makedirs("result", exist_ok=True)
 
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+    //device = torch.cuda.current_device()
     print(f"Device : {device}")
 
     train_dataset, val_dataset = CIFAR10Dataset(args.data_path, True), \
@@ -42,6 +42,7 @@ def train(args):
                                DataLoader(val_dataset, batch_size=args.batch_size, shuffle=True, num_workers=4)
     
     net = resnet50(weights=ResNet50_Weights.IMAGENET1K_V1).device()
+    net = DistributedDataParallel(net, device_ids=[device], output_device=device)
     criterion = CrossEntropyLoss()
     optimizer = Adam(net.parameters(), lr=args.learning_rate)
 
