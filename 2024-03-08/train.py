@@ -33,7 +33,7 @@ def train(args):
     os.makedirs("result", exist_ok=True)
 
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
-    //device = torch.cuda.current_device()
+    #device = torch.cuda.current_device()
     print(f"Device : {device}")
 
     train_dataset, val_dataset = CIFAR10Dataset(args.data_path, True), \
