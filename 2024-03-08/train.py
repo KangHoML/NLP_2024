@@ -41,7 +41,7 @@ def train(args):
     train_loader, val_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=4), \
                                DataLoader(val_dataset, batch_size=args.batch_size, shuffle=True, num_workers=4)
     
-    net = resnet50(weights=ResNet50_Weights.IMAGENET1K_V1).device()
+    net = resnet50(weights=ResNet50_Weights.IMAGENET1K_V1).to(device)
     net = DistributedDataParallel(net, device_ids=[devices], output_device=devices)
     criterion = CrossEntropyLoss()
     optimizer = Adam(net.parameters(), lr=args.learning_rate)
