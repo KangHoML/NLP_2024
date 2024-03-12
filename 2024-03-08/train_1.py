@@ -3,64 +3,41 @@ import torch
 import argparse
 import matplotlib.pyplot as plt
 
-from torchvision.models import resnet50, ResNet50_Weights
-from torch.utils.data import DataLoader, DistributedSampler
+from torch.utils.data import DataLoader
 from torch.nn import CrossEntropyLoss
 from torch.optim import Adam
 from tqdm import tqdm
 
-import torch.distributed as dist
-from torch.nn.parallel import DistributedDataParallel
-
 from data import CIFAR10Dataset
+from resnet import ResNet
+
 parser = argparse.ArgumentParser()
-parser.add_argument("--data_path", type=str, default="../../datasets/CIFAR-10")
+parser.add_argument("--data_path", type=str, default="./datasets/CIFAR-10")
+parser.add_argument("--model", type=str, default="VGG16")
+parser.add_argument("--bn_flag", type=bool, default=True)
+parser.add_argument("--kernel_size", type=int, default=3)
 parser.add_argument("--batch_size", type=int, default=128)
 parser.add_argument("--learning_rate", type=float, default=0.01)
 parser.add_argument("--epoch", type=int, default=20)
 
-def plot_loss(train_losses, val_losses):
-    plt.figure(figsize=(10, 5))
-    plt.plot(range(1, len(train_losses)+1), train_losses, label ='Train_Loss', marker ='o')
-    plt.plot(range(1, len(val_losses)+1), val_losses, label ='Validation_Loss', marker ='o')
-    plt.xlabel('Epoch')
-    plt.ylabel('Loss')
-
-    title = "ResNet50 with pretrained"
-    plt.title(title)
-    plt.legend()
-    plt.grid()
-    plt.savefig(f'./result/{title}.png')
+def get_model(model):
+    if "ResNet" in model:
+        return ResNet(cfg=model)
+    else:
+        raise NotImplementedError(model)
 
 def train(args):
     os.makedirs("result", exist_ok=True)
 
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
-    
-    # 1. initialize process group
-    dist.init_process_group("nccl")
-    rank = dist.get_rank()
-    torch.cuda.set_device(rank)
-    devices = torch.cuda.current_device()
-    world_size = dist.get_world_size()
-    
     print(f"Device : {device}")
 
     train_dataset, val_dataset = CIFAR10Dataset(args.data_path, True), \
                                  CIFAR10Dataset(args.data_path, False)
-
-    sampler = DistributedSampler(
-        train_dataset,
-        num_replicas=world_size,
-        rank=rank,
-        shuffle=True,
-    )
-
-    train_loader, val_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=False, num_workers=4, sampler=sampler, pin_memory=True,), \
+    train_loader, val_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=4), \
                                DataLoader(val_dataset, batch_size=args.batch_size, shuffle=True, num_workers=4)
     
-    net = resnet50(weights=ResNet50_Weights.IMAGENET1K_V1).to(device)
-    net = DistributedDataParallel(net, device_ids=[devices], output_device=devices)
+    net = get_model(args.model).to(device)
     criterion = CrossEntropyLoss()
     optimizer = Adam(net.parameters(), lr=args.learning_rate)
 
@@ -122,9 +99,13 @@ def train(args):
         print(f"Epoch [{epoch+1}/{args.epoch}]")
         print(f"  Train Loss: {train_loss:.4f}, Train Accuracy: {train_accuracy:.2f}%")
         print(f"  Val Loss: {val_loss:.4f}, Val Accuracy: {val_accuracy:.2f}%")
-    
-    plot_loss(train_losses, val_losses)
 
 if __name__ == "__main__":
     args = parser.parse_args()
     train(args)
+
+
+
+
+    
+    
