@@ -64,26 +64,30 @@ def train(args):
     criterion = CrossEntropyLoss()
     optimizer = Adam(net.parameters(), lr=args.learning_rate)
 
+    scaler = torch.cuda.amp.GradScaler()
+
     train_losses = []
     val_losses = []
 
-    for epoch in range(args.epoch):
+     for epoch in range(args.epoch):
         train_loss = 0.0
         train_correct = 0
         train_total = 0
 
         net.train()
-
+        
         for inputs, labels in tqdm(train_loader):
             inputs = inputs.to(device)
             labels = labels.to(device)
             optimizer.zero_grad()
 
-            outputs = net(inputs)
-            loss = criterion(outputs, labels)
-
-            loss.backward()
-            optimizer.step()
+            with torch.cuda.amp.autocast():
+                outputs = net(inputs)
+                loss = criterion(outputs, labels)
+            
+            scaler.scale(loss).backward()
+            scaler.step(optimizer)
+            scaler.update()
 
             _, predicted = torch.max(outputs.data, 1)
             train_total += labels.size(0)
