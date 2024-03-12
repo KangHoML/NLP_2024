@@ -33,7 +33,7 @@ def train(args):
     os.makedirs("result", exist_ok=True)
 
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
-    #device = torch.cuda.current_device()
+    devices = torch.cuda.current_device()
     print(f"Device : {device}")
 
     train_dataset, val_dataset = CIFAR10Dataset(args.data_path, True), \
@@ -42,7 +42,7 @@ def train(args):
                                DataLoader(val_dataset, batch_size=args.batch_size, shuffle=True, num_workers=4)
     
     net = resnet50(weights=ResNet50_Weights.IMAGENET1K_V1).device()
-    net = DistributedDataParallel(net, device_ids=[device], output_device=device)
+    net = DistributedDataParallel(net, device_ids=[devices], output_device=devices)
     criterion = CrossEntropyLoss()
     optimizer = Adam(net.parameters(), lr=args.learning_rate)
 
