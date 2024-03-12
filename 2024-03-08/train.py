@@ -33,12 +33,27 @@ def train(args):
     os.makedirs("result", exist_ok=True)
 
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+    
+    # 1. initialize process group
+    dist.init_process_group("nccl")
+    rank = dist.get_rank()
+    torch.cuda.set_device(rank)
     devices = torch.cuda.current_device()
+    world_size = dist.get_world_size()
+    
     print(f"Device : {device}")
 
     train_dataset, val_dataset = CIFAR10Dataset(args.data_path, True), \
                                  CIFAR10Dataset(args.data_path, False)
-    train_loader, val_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=4), \
+
+    sampler = DistributedSampler(
+        train_dataset,
+        num_replicas=world_size,
+        rank=rank,
+        shuffle=True,
+    )
+
+    train_loader, val_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=False, num_workers=4, sampler=sampler, pin_memory=True,), \
                                DataLoader(val_dataset, batch_size=args.batch_size, shuffle=True, num_workers=4)
     
     net = resnet50(weights=ResNet50_Weights.IMAGENET1K_V1).to(device)
