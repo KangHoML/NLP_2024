@@ -69,7 +69,7 @@ def train(args):
     train_losses = []
     val_losses = []
 
-     for epoch in range(args.epoch):
+    for epoch in range(args.epoch):
         train_loss = 0.0
         train_correct = 0
         train_total = 0
