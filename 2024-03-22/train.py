@@ -39,7 +39,7 @@ parser.add_argument("--step_size", type=float, default=1.0)
 parser.add_argument("--gamma", type=float, default=0.1)
 parser.add_argument("--batch_size", type=int, default=32)
 parser.add_argument("--learning_rate", type=float, default=1e-3)
-parser.add_argument("--epoch", type=int, default=10)
+parser.add_argument("--epoch", type=int, default=200)
 
 def plot_loss(train_losses, val_losses):
     plt.figure(figsize=(10, 5))
