@@ -45,7 +45,7 @@ class SentenceClassifier(nn.Module):
 if __name__ == "__main__":
     src_vocab_size = 40710
     
-    net = SentenceClassifier(src_vocab_size, hidden_size=64, embed_size=128, n_layers=2, model_type='rnn')
+    net = SentenceClassifier(src_vocab_size, hidden_size=64, embed_size=128, n_layers=1, model_type='lstm')
     random_input = torch.randint(low=0, high=src_vocab_size, size=(64, 500), dtype=torch.long)
 
     random_output = net(random_input)
