@@ -35,11 +35,14 @@ parser.add_argument("--bidirectional", type=bool, default=False)
 # -- hyperparameter about train
 parser.add_argument("--optimizer", type=str, default='Adam')
 parser.add_argument("--lr_scheduler", type=str, default='Step')
-parser.add_argument("--step_size", type=float, default=1.0)
+parser.add_argument("--step_size", type=int, default=1)
 parser.add_argument("--gamma", type=float, default=0.1)
 parser.add_argument("--batch_size", type=int, default=32)
 parser.add_argument("--learning_rate", type=float, default=1e-3)
 parser.add_argument("--epoch", type=int, default=10)
+
+# -- hyperparamter for saving model
+parser.add_argument("--save", type=str, default="rnn_1")
 
 def plot_loss(train_losses, val_losses):
     plt.figure(figsize=(10, 5))
@@ -48,7 +51,7 @@ def plot_loss(train_losses, val_losses):
     plt.xlabel('Epoch')
     plt.ylabel('Loss')
 
-    title = f"{args.model}"
+    title = f"{args.save}"
     plt.title(title)
     plt.legend()
     plt.grid()
@@ -211,7 +214,7 @@ def main():
                     weights = net.module.state_dict()
                 else:
                     weights = net.state_dict()
-                torch.save(weights, f'./result/{args.model}.pth')
+                torch.save(weights, f'./result/{args.save}.pth')
 
     if rank == 0:
         plot_loss(train_losses, val_losses)
