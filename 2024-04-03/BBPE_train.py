@@ -1,6 +1,7 @@
 import sentencepiece as spm
 from pathlib import Path
 
+data_dir = './data'
 paths = [str(x) for x in Path(data_dir).glob("*.txt")]
 corpus = ",".join(paths)
 prefix = "t5-sp-bpe-nsmc-byte-fallback"
