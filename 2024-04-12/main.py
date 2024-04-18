@@ -74,11 +74,11 @@ def plot_loss(train_losses, val_losses):
 # model 설정
 def get_network():
     if args.model == 'ViT':
-        ViT(patch_size=args.patch_size, embed_mode=args.embed_mode)
+        return ViT(patch_size=args.patch_size, embed_mode=args.embed_mode)
     elif args.model == 'ConvNext':
-        ConvNeXt_T(patch_size=args.patch_size, cfgs=args.cfgs, pretrained=args.pretrained)
+        return ConvNeXt_T(patch_size=args.patch_size, cfgs=args.cfgs, pretrained=args.pretrained)
     else:
-        ValueError(args.model)
+        return ValueError(args.model)
 
 # optimizer type 설정
 def get_optimizer():
