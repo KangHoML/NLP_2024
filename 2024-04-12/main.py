@@ -49,7 +49,7 @@ parser.add_argument("--cfgs", type=parse_cfgs, default=None)
 parser.add_argument("--optimizer", type=str, default='SGD')
 parser.add_argument("--weight_decay", type=float, default=0.0)
 parser.add_argument("--lr_scheduler", type=str, default=None)
-parser.add_argument("--step_size", type=int, default=1)
+parser.add_argument("--step_size", type=int, default=0)
 parser.add_argument("--gamma", type=float, default=1.0)
 parser.add_argument("--batch_size", type=int, default=16)
 parser.add_argument("--learning_rate", type=float, default=1e-3)
@@ -98,7 +98,8 @@ def get_scheduler(optimizer, loader_len):
     elif args.lr_scheduler == "Cosine":
         return CosineAnnealingLR(optimizer, T_max=args.step_size)
     elif args.lr_scheduler == "Cycle":
-        return OneCycleLR(optimizer, max_lr=args.learning_rate, steps_per_epoch=loader_len, epochs=args.epoch)
+        return OneCycleLR(optimizer, max_lr=args.learning_rate,
+                          steps_per_epoch = loader_len if (args.step_size == 0) else args.step_size, epochs=args.epoch)
     else:
         raise ValueError(args.lr_scheduler)
 

@@ -28,43 +28,11 @@
 #                 >> './result/convnext.txt'
 
 python3 main.py --model 'ConvNext' \
-                --cfgs '2 64, 2 128, 6 256, 2 512' \
-                --patch_size 1 \
-                --optimizer 'AdamW' \
-                --batch_size 32 \
-                --learning_rate 5e-4 \
-                --epoch 50 \
-                --save 'ckpt_cfgs' \
-                >> './result/convnext.txt'
-
-python3 main.py --model 'ConvNext' \
-                --cfgs '2 64, 2 128, 6 256, 2 512' \
-                --patch_size 1 \
-                --optimizer 'AdamW' \
-                --batch_size 32 \
-                --learning_rate 5e-3 \
-                --lr_scheduler 'Cycle' \
-                --epoch 50 \
-                --save 'ckpt_cfgs' \
-                >> './result/convnext.txt'
-
-python3 main.py --model 'ConvNext' \
                 --cfgs '2 64, 2 128, 2 256, 2 512' \
                 --patch_size 1 \
                 --optimizer 'AdamW' \
                 --batch_size 32 \
-                --learning_rate 5e-4 \
-                --epoch 50 \
-                --save 'ckpt_cfgs' \
-                >> './result/convnext.txt'
-
-python3 main.py --model 'ConvNext' \
-                --cfgs '2 64, 2 128, 2 256, 2 512' \
-                --patch_size 1 \
-                --optimizer 'AdamW' \
-                --batch_size 32 \
-                --learning_rate 5e-3 \
-                --lr_scheduler 'Cycle' \
+                --learning_rate 1e-3 \
                 --epoch 50 \
                 --save 'ckpt_cfgs' \
                 >> './result/convnext.txt'
